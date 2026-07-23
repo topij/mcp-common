@@ -1,0 +1,20 @@
+# Pre-commit hooks. Install once:  pre-commit install
+# Run on all files:  pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      # Lint only — mirrors CI (.github/workflows/ci.yml runs `ruff check`, not
+      # `ruff format --check`). `--extra dev` so the project-pinned ruff is used,
+      # not a global one.
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --extra dev ruff check mcp_common tests
+        language: system
+        types: [python]
+        pass_filenames: false
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
