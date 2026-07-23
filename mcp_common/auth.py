@@ -217,7 +217,9 @@ class AuthMiddleware:
             try:
                 accepted = await verifier.verify(headers)
             except Exception:
-                logger.exception("verifier %s raised; treating as a rejection", verifier.name)
+                logger.exception(
+                    "verifier %s raised; treating as a rejection", verifier.name
+                )
                 accepted = False
             if accepted:
                 await self._app(scope, receive, send)
@@ -235,7 +237,9 @@ class AuthMiddleware:
         await response(scope, receive, send)
 
 
-def verifiers_from_settings(settings: CommonSettings) -> list[Verifier]:
+def verifiers_from_settings(
+    settings: CommonSettings, *, secret_header: str = "x-mcp-key"
+) -> list[Verifier]:
     """Build the verifiers the environment implies.
 
     Returns an empty list when nothing is configured — deliberately, so that passing
@@ -249,7 +253,9 @@ def verifiers_from_settings(settings: CommonSettings) -> list[Verifier]:
             )
         )
     if settings.access_key:
-        verifiers.append(SharedSecretVerifier(settings.access_key))
+        verifiers.append(
+            SharedSecretVerifier(settings.access_key, header=secret_header)
+        )
     return verifiers
 
 
@@ -259,11 +265,12 @@ def auth_middleware_from_settings(
     *,
     protected_prefixes: Sequence[str] = DEFAULT_PROTECTED_PREFIXES,
     exempt_paths: Sequence[str] = DEFAULT_EXEMPT_PATHS,
+    secret_header: str = "x-mcp-key",
 ) -> AuthMiddleware:
     """Wrap `app` using whatever credentials `settings` carries."""
     return AuthMiddleware(
         app,
-        verifiers_from_settings(settings),
+        verifiers_from_settings(settings, secret_header=secret_header),
         protected_prefixes=protected_prefixes,
         exempt_paths=exempt_paths,
     )
