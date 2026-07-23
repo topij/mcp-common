@@ -188,8 +188,9 @@ class AuthMiddleware:
         if not resolved:
             raise AuthConfigError(
                 "AuthMiddleware requires at least one verifier — refusing to start with "
-                "an unguarded MCP surface. Set MCP_ACCESS_KEY, or CF_ACCESS_TEAM_DOMAIN "
-                "plus CF_ACCESS_AUD, or leave the middleware off deliberately."
+                "an unguarded MCP surface. Set the access-key env var (MCP_ACCESS_KEY by "
+                "default), or CF_ACCESS_TEAM_DOMAIN plus CF_ACCESS_AUD, or leave the "
+                "middleware off deliberately."
             )
         self._app = app
         self._verifiers = resolved

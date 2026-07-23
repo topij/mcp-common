@@ -20,7 +20,7 @@ Fixing any of those meant fixing it three times, and in practice it got fixed on
 ```toml
 # pyproject.toml
 dependencies = [
-    "mcp-common @ git+https://github.com/topij/mcp-common@v0.1.0",
+    "mcp-common @ git+https://github.com/topij/mcp-common@v0.1.1",
 ]
 ```
 
@@ -31,7 +31,7 @@ The Cloudflare Access verifier needs an extra:
 
 ```toml
 dependencies = [
-    "mcp-common[cloudflare] @ git+https://github.com/topij/mcp-common@v0.1.0",
+    "mcp-common[cloudflare] @ git+https://github.com/topij/mcp-common@v0.1.1",
 ]
 ```
 
