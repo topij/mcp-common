@@ -217,9 +217,7 @@ class AuthMiddleware:
             try:
                 accepted = await verifier.verify(headers)
             except Exception:
-                logger.exception(
-                    "verifier %s raised; treating as a rejection", verifier.name
-                )
+                logger.exception("verifier %s raised; treating as a rejection", verifier.name)
                 accepted = False
             if accepted:
                 await self._app(scope, receive, send)

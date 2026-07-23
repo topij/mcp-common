@@ -351,18 +351,9 @@ def test_auth_middleware_from_settings_honours_a_custom_secret_header():
     ("given", "expected"),
     [
         ("example-team", "https://example-team.cloudflareaccess.com"),
-        (
-            "example-team.cloudflareaccess.com",
-            "https://example-team.cloudflareaccess.com",
-        ),
-        (
-            "https://example-team.cloudflareaccess.com",
-            "https://example-team.cloudflareaccess.com",
-        ),
-        (
-            "https://example-team.cloudflareaccess.com/",
-            "https://example-team.cloudflareaccess.com",
-        ),
+        ("example-team.cloudflareaccess.com", "https://example-team.cloudflareaccess.com"),
+        ("https://example-team.cloudflareaccess.com", "https://example-team.cloudflareaccess.com"),
+        ("https://example-team.cloudflareaccess.com/", "https://example-team.cloudflareaccess.com"),
         ("  example-team  ", "https://example-team.cloudflareaccess.com"),
     ],
 )
@@ -417,9 +408,7 @@ async def test_missing_cf_header_is_rejected(cf_verifier):
 @pytest.mark.asyncio
 async def test_cf_token_for_another_application_is_rejected(cf_verifier, rsa_key):
     # Same Cloudflare team, different app — the audience check is what stops this.
-    headers = {
-        CloudflareAccessVerifier.HEADER: _token(rsa_key, aud="someone-elses-app")
-    }
+    headers = {CloudflareAccessVerifier.HEADER: _token(rsa_key, aud="someone-elses-app")}
     assert await cf_verifier.verify(headers) is False
 
 
@@ -453,10 +442,7 @@ async def test_cf_token_signed_by_the_wrong_key_is_rejected(cf_verifier):
 
 @pytest.mark.asyncio
 async def test_garbage_cf_token_is_rejected(cf_verifier):
-    assert (
-        await cf_verifier.verify({CloudflareAccessVerifier.HEADER: "not-a-jwt"})
-        is False
-    )
+    assert await cf_verifier.verify({CloudflareAccessVerifier.HEADER: "not-a-jwt"}) is False
 
 
 @pytest.mark.asyncio

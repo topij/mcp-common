@@ -39,10 +39,7 @@ def test_env_level_is_honoured(monkeypatch):
 def test_argument_beats_env(monkeypatch):
     _reset_root()
     monkeypatch.setenv("LOG_LEVEL", "debug")
-    assert (
-        setup_logging("svc-d", level="ERROR", stream=io.StringIO()).level
-        == logging.ERROR
-    )
+    assert setup_logging("svc-d", level="ERROR", stream=io.StringIO()).level == logging.ERROR
 
 
 def test_noisy_loggers_are_quieted():
