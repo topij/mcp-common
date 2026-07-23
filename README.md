@@ -20,7 +20,7 @@ Fixing any of those meant fixing it three times, and in practice it got fixed on
 ```toml
 # pyproject.toml
 dependencies = [
-    "mcp-common @ git+https://github.com/topij/mcp-common@v0.1.0",
+    "mcp-common @ git+https://github.com/topij/mcp-common@v0.1.1",
 ]
 ```
 
@@ -31,7 +31,7 @@ The Cloudflare Access verifier needs an extra:
 
 ```toml
 dependencies = [
-    "mcp-common[cloudflare] @ git+https://github.com/topij/mcp-common@v0.1.0",
+    "mcp-common[cloudflare] @ git+https://github.com/topij/mcp-common@v0.1.1",
 ]
 ```
 
@@ -50,6 +50,9 @@ Reads `MCP_HOST`, `MCP_PORT`, `LOG_LEVEL`, `MAX_CONTENT_CHARS`, `EMBEDDING_MODEL
 `CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD`. Nothing is required at load time — a missing
 secret surfaces as a clean error where it's used, not as an import-time `KeyError`
 before logging is even configured.
+
+The access-key env var name is configurable via `access_key_var=` (default
+`"MCP_ACCESS_KEY"`), for a consumer that wants its own var name instead of a workaround.
 
 Service-specific config (database URLs, vault paths, bot tokens) stays in the service.
 
@@ -125,7 +128,9 @@ only the event stream would be theatre). `/health` stays open for probes.
 
 Accepts either a Cloudflare Access JWT (`Cf-Access-Jwt-Assertion`, verified against the
 team JWKS with issuer, **audience**, and expiry checked) or a pre-shared key
-(`x-mcp-key` header or `Authorization: Bearer`, compared in constant time).
+(`x-mcp-key` header or `Authorization: Bearer`, compared in constant time). The header
+name is configurable via `secret_header=` (default `"x-mcp-key"`) on both
+`auth_middleware_from_settings` and `verifiers_from_settings`.
 
 Two deliberate properties:
 

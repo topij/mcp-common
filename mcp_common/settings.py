@@ -63,6 +63,7 @@ def load_settings(
     default_host: str = "127.0.0.1",
     default_port: int = 8000,
     default_max_content_chars: int = DEFAULT_MAX_CONTENT_CHARS,
+    access_key_var: str = "MCP_ACCESS_KEY",
     env: Mapping[str, str] | None = None,
 ) -> CommonSettings:
     """Read the shared settings from the environment.
@@ -82,7 +83,7 @@ def load_settings(
         embedding_base_url=env.get("EMBEDDING_BASE_URL") or DEFAULT_BASE_URL,
         embedding_timeout=_env_float(env, "EMBEDDING_TIMEOUT", DEFAULT_TIMEOUT),
         openrouter_api_key=_env_str(env, "OPENROUTER_API_KEY"),
-        access_key=_env_str(env, "MCP_ACCESS_KEY"),
+        access_key=_env_str(env, access_key_var),
         cf_access_team_domain=_env_str(env, "CF_ACCESS_TEAM_DOMAIN"),
         cf_access_audience=_env_str(env, "CF_ACCESS_AUD"),
     )

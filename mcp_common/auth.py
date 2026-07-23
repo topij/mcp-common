@@ -188,8 +188,9 @@ class AuthMiddleware:
         if not resolved:
             raise AuthConfigError(
                 "AuthMiddleware requires at least one verifier — refusing to start with "
-                "an unguarded MCP surface. Set MCP_ACCESS_KEY, or CF_ACCESS_TEAM_DOMAIN "
-                "plus CF_ACCESS_AUD, or leave the middleware off deliberately."
+                "an unguarded MCP surface. Set the access-key env var (MCP_ACCESS_KEY by "
+                "default), or CF_ACCESS_TEAM_DOMAIN plus CF_ACCESS_AUD, or leave the "
+                "middleware off deliberately."
             )
         self._app = app
         self._verifiers = resolved
@@ -235,7 +236,9 @@ class AuthMiddleware:
         await response(scope, receive, send)
 
 
-def verifiers_from_settings(settings: CommonSettings) -> list[Verifier]:
+def verifiers_from_settings(
+    settings: CommonSettings, *, secret_header: str = "x-mcp-key"
+) -> list[Verifier]:
     """Build the verifiers the environment implies.
 
     Returns an empty list when nothing is configured — deliberately, so that passing
@@ -249,7 +252,9 @@ def verifiers_from_settings(settings: CommonSettings) -> list[Verifier]:
             )
         )
     if settings.access_key:
-        verifiers.append(SharedSecretVerifier(settings.access_key))
+        verifiers.append(
+            SharedSecretVerifier(settings.access_key, header=secret_header)
+        )
     return verifiers
 
 
@@ -259,11 +264,12 @@ def auth_middleware_from_settings(
     *,
     protected_prefixes: Sequence[str] = DEFAULT_PROTECTED_PREFIXES,
     exempt_paths: Sequence[str] = DEFAULT_EXEMPT_PATHS,
+    secret_header: str = "x-mcp-key",
 ) -> AuthMiddleware:
     """Wrap `app` using whatever credentials `settings` carries."""
     return AuthMiddleware(
         app,
-        verifiers_from_settings(settings),
+        verifiers_from_settings(settings, secret_header=secret_header),
         protected_prefixes=protected_prefixes,
         exempt_paths=exempt_paths,
     )

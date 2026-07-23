@@ -324,6 +324,24 @@ def test_cloudflare_needs_both_vars_to_activate():
     assert verifiers == []
 
 
+def test_verifiers_from_settings_honours_a_custom_secret_header():
+    settings = load_settings("brain", env={"MCP_ACCESS_KEY": SECRET})
+    verifiers = verifiers_from_settings(settings, secret_header="x-brain-key")
+    client = TestClient(AuthMiddleware(_inner_app(), verifiers))
+    assert client.get("/sse", headers={"x-brain-key": SECRET}).status_code == 200
+    assert client.get("/sse", headers={"x-mcp-key": SECRET}).status_code == 401
+
+
+def test_auth_middleware_from_settings_honours_a_custom_secret_header():
+    settings = load_settings("brain", env={"MCP_ACCESS_KEY": SECRET})
+    middleware = auth_middleware_from_settings(
+        _inner_app(), settings, secret_header="x-brain-key"
+    )
+    client = TestClient(middleware)
+    assert client.get("/sse", headers={"x-brain-key": SECRET}).status_code == 200
+    assert client.get("/sse", headers={"x-mcp-key": SECRET}).status_code == 401
+
+
 # ---------------------------------------------------------------------------
 # Cloudflare Access JWT verification
 # ---------------------------------------------------------------------------

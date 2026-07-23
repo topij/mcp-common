@@ -84,3 +84,20 @@ def test_settings_are_frozen():
     s = load_settings("brain", env={})
     with pytest.raises(Exception):
         s.port = 1234  # type: ignore[misc]
+
+
+def test_access_key_var_reads_from_a_custom_env_name():
+    s = load_settings(
+        "voice-notes",
+        access_key_var="VOICE_NOTES_ACCESS_KEY",
+        env={
+            "VOICE_NOTES_ACCESS_KEY": "shhh",
+            "MCP_ACCESS_KEY": "ignored",
+        },
+    )
+    assert s.access_key == "shhh"
+
+
+def test_access_key_var_defaults_to_mcp_access_key():
+    s = load_settings("brain", env={"MCP_ACCESS_KEY": "shhh"})
+    assert s.access_key == "shhh"
